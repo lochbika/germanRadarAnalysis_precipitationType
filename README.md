@@ -1,6 +1,6 @@
 # germanRadarAnalysis_precipitationType
 
-This repository is part of the germanRADARanalysis. Here, we create a gridded data set of precipitation types in Germany.
+This repository is part of the germanRADARanalysis project. Here, we create a gridded data set of precipitation types in Germany. More details about the project can be found on [my personal website](https://lochbihler.nl/?page_id=302).
 
 ## Steps to run
 
