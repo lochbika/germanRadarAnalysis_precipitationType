@@ -4,7 +4,7 @@ library(doFuture)
 library(abind)
 library(reshape2)
 
-# load saved tracks file and station data
+# load station data and information
 load(file = paste(dir_data, "station_metaIndex_cloud_type.RData", sep = ""))
 load(file = paste(dir_data, "stationdata_CS_DWD.RData", sep = ""))
 
@@ -318,7 +318,7 @@ tic()
 # station_closest_gridpoint)
 # Q1
 # Q2
-# nStations: the total number of station records in each gridpoint per record (4 timesteps);incl. instrument
+# nStations: the total number of station records in each gridpoint per record; incl. instrument
 # nStationwithclouds: the number of station records with a coverage > 0
 # nNA: the total number of station records with missing values
 # nInstrument: the number of station records with instrument measurements
