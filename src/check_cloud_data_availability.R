@@ -4,7 +4,7 @@ library(reshape2)
 # load saved tracks file
 load(file = paste(
   dir_data,
-  "parallel_hourly_gridded_cloudtypes_Q1_Q2_timeseries.RData",
+  "gridded_precipitationType_Q1_Q2_timeseries.RData",
   sep = ""
 ))
 
@@ -13,17 +13,16 @@ load(file = paste(
 # gridded data set
 
 # generate dates for gridded data from dimnames
-grid.cloudtypes.date <-
-  as.POSIXct(as.numeric(dimnames(grid.cloudtypes.timeseries)$date), tz = "UTC",
-             origin = "1970-01-01 00:00")
+grid.precipitationType.date <-
+  as.POSIXct(dimnames(grid.precipitationType.timeseries)$datetime, tz = "UTC")
 
-grid.cloudtypes.date.month <-
-  format(grid.cloudtypes.date, format = "%Y-%m")
+grid.precipitationType.date.month <-
+  format(grid.precipitationType.date, format = "%Y-%m")
 
 # plot number of stations with data available
 monthly.nStations <- aggregate(
-  grid.cloudtypes.timeseries[1, "nStations",],
-  by = list(grid.cloudtypes.date.month),
+  grid.precipitationType.timeseries[1, "nStations", ],
+  by = list(grid.precipitationType.date.month),
   FUN = mean,
   na.rm = T
 )
@@ -35,8 +34,8 @@ colnames(monthly.nStations) <- c("date", paste("grid point", 1))
 
 for (i in 2:6) {
   tmp <- aggregate(
-    grid.cloudtypes.timeseries[i, "nStations",],
-    by = list(grid.cloudtypes.date.month),
+    grid.precipitationType.timeseries[i, "nStations", ],
+    by = list(grid.precipitationType.date.month),
     FUN = mean,
     na.rm = T
   )
@@ -86,8 +85,8 @@ ggsave(
 
 # plot number of stations with instrument measurements
 monthly.nStations <- aggregate(
-  grid.cloudtypes.timeseries[1, "nInstrument",],
-  by = list(grid.cloudtypes.date.month),
+  grid.precipitationType.timeseries[1, "nInstrument", ],
+  by = list(grid.precipitationType.date.month),
   FUN = mean,
   na.rm = T
 )
@@ -99,8 +98,8 @@ colnames(monthly.nStations) <- c("date", paste("grid point", 1))
 
 for (i in 2:6) {
   tmp <- aggregate(
-    grid.cloudtypes.timeseries[i, "nInstrument",],
-    by = list(grid.cloudtypes.date.month),
+    grid.precipitationType.timeseries[i, "nInstrument", ],
+    by = list(grid.precipitationType.date.month),
     FUN = mean,
     na.rm = T
   )

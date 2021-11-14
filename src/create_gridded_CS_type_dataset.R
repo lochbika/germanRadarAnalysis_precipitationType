@@ -5,7 +5,6 @@ library(abind)
 library(reshape2)
 
 # load saved tracks file and station data
-#load(file = paste(dir_data, "tracks.lifecycles.RData", sep = ""))
 load(file = paste(dir_data, "station_metaIndex_cloud_type.RData", sep = ""))
 load(file = paste(dir_data, "stationdata_CS_DWD.RData", sep = ""))
 
@@ -32,15 +31,15 @@ gridstationids <-
   gridstationids.ordered <- gridstationids
   
   for (i in seq_len(nrow(gridstationids)))
-    gridstationids.ordered[i,] <-
-    gridstationids[i, order(gridstationdistance[i, ])]
+    gridstationids.ordered[i, ] <-
+    gridstationids[i, order(gridstationdistance[i,])]
   }
 {
   gridstationdistance.ordered <- gridstationdistance
   
   for (i in seq_len(nrow(gridstationdistance)))
-    gridstationdistance.ordered[i,] <-
-    gridstationdistance[i, order(gridstationdistance[i, ])]
+    gridstationdistance.ordered[i, ] <-
+    gridstationdistance[i, order(gridstationdistance[i,])]
 }
 rm(gridstationdistance, gridstationids)
 
@@ -54,22 +53,22 @@ stationdataCS.df <-
 stationdataCS.df$.id <- as.numeric(stationdataCS.df$.id)
 
 stationdataCS.df <-
-  stationdataCS.df[order(stationdataCS.df$datetime), ]
+  stationdataCS.df[order(stationdataCS.df$datetime),]
 
 # remove unused months
 stationdataCS.m <-
   as.matrix(stationdataCS.df[format(stationdataCS.df$datetime, "%m") %in% months &
-                               stationdataCS.df$V_S1_CS %in% c(5, 6, 7, 8, 9, NA, -1), c(".id", "V_N", "V_S1_CS", "V_S2_CS", "V_S3_CS", "V_S4_CS")])
+                               stationdataCS.df$V_S1_CS %in% c(5, 6, 7, 8, 9, NA,-1), c(".id", "V_N", "V_S1_CS", "V_S2_CS", "V_S3_CS", "V_S4_CS")])
 stationdataCS.dates <-
   stationdataCS.df[format(stationdataCS.df$datetime, "%m") %in% months &
-                     stationdataCS.df$V_S1_CS %in% c(5, 6, 7, 8, 9, NA, -1), c("datetime")]
+                     stationdataCS.df$V_S1_CS %in% c(5, 6, 7, 8, 9, NA,-1), c("datetime")]
 rm(stationdataCS.df, stationdataCS)
 
 # remove missing values
 stationdataCS.dates <-
   stationdataCS.dates[!is.na(stationdataCS.m[, "V_S1_CS"])]
 stationdataCS.m <-
-  stationdataCS.m[!is.na(stationdataCS.m[, "V_S1_CS"]),]
+  stationdataCS.m[!is.na(stationdataCS.m[, "V_S1_CS"]), ]
 
 # create date index for the gridded data; hourly
 grid.dates <-
@@ -78,17 +77,16 @@ grid.dates <-
     to = as.POSIXct("2020-12-31 23:00", tz = "UTC"),
     by = "hour"
   )
-#grid.dates <- grid.dates[seq(1, length(grid.dates), 3)]
 grid.dates <- grid.dates[format(grid.dates, "%m") %in% months]
 
 #
 # for debugging the function below
-grid_date <- grid.dates[788]
-stationdata <- stationdataCS.m
-station_dates <- stationdataCS.dates
-station_index <- metaIndex
-station_closest_gridpoint <- gridstationids.ordered[, 1]
-nmissStat <- nStationsGridpoint
+# grid_date <- grid.dates[788]
+# stationdata <- stationdataCS.m
+# station_dates <- stationdataCS.dates
+# station_index <- metaIndex
+# station_closest_gridpoint <- gridstationids.ordered[, 1]
+# nmissStat <- nStationsGridpoint
 # define function to create gridded data for one time step
 gridCloudTypes <-
   function(grid_date,
@@ -97,14 +95,8 @@ gridCloudTypes <-
            station_index,
            station_closest_gridpoint,
            nmissStat) {
-    # select records from all stations within 3 hours of this timestep
-    # timesequence.ts <- seq.POSIXt(
-    #   from = as.POSIXct(grid_date - (1.5 * 3600), tz = "UTC"),
-    #   to = as.POSIXct(grid_date + (1.5 * 3600), tz = "UTC"),
-    #   by = "hour"
-    # )
     stationdata.ts <-
-      stationdata[station_dates %in% grid_date, ]
+      stationdata[station_dates %in% grid_date,]
     
     # define output matrix
     output <- matrix(NA, ncol = 6, nrow = 6)
@@ -240,9 +232,12 @@ gridCloudTypes <-
         FUN = sum
       )
     
-    if(all(colnames(grid.raintype) != '0' ))grid.raintype$`0` <- rep(0,dim(grid.raintype)[1])
-    if(all(colnames(grid.raintype) != '1' ))grid.raintype$`1` <- rep(0,dim(grid.raintype)[1])
-    if(all(colnames(grid.raintype) != '2' ))grid.raintype$`2` <- rep(0,dim(grid.raintype)[1])
+    if (all(colnames(grid.raintype) != '0'))
+      grid.raintype$`0` <- rep(0, dim(grid.raintype)[1])
+    if (all(colnames(grid.raintype) != '1'))
+      grid.raintype$`1` <- rep(0, dim(grid.raintype)[1])
+    if (all(colnames(grid.raintype) != '2'))
+      grid.raintype$`2` <- rep(0, dim(grid.raintype)[1])
     
     grid.raintype$Q1 <- rep(0, dim(grid.raintype)[1])
     grid.raintype$Q2 <- rep(0, dim(grid.raintype)[1])
@@ -253,8 +248,7 @@ gridCloudTypes <-
     grid.raintype$Q1[grid.raintype$`1` == 0 &
                        grid.raintype$`2` > 0] <- 2
     grid.raintype$Q1[grid.raintype$`1` > 0 &
-                       grid.raintype$`2` > 0] <-
-      0
+                       grid.raintype$`2` > 0] <- 0
     
     grid.raintype$Q2[grid.raintype$`1` > 0 &
                        grid.raintype$`2` == 0 &
@@ -280,15 +274,7 @@ gridCloudTypes <-
     #
     # fill in number of present and missing stations
     nStat <- table(cloudTypeFrequencies$gridpoint)
-    # nmissStat <-
-    #   aggregate(
-    #     is.na(cloudTypeFrequencies$stationClass),
-    #     FUN = sum,
-    #     by = list(cloudTypeFrequencies$gridpoint)
-    #   )
     output[names(nStat), 4] <- nStat
-    # output[nmissStat$Group.1, 6] <-
-    #   nmissStat$x
     output[names(nStat), 5] <- nmissStat[names(nStat)] - nStat
     
     #
@@ -311,26 +297,6 @@ gridCloudTypes <-
     output[coverage$Group.1, 3] <-
       coverage$x
     
-    #
-    # fill in n stations with clouds
-    # nStatwC <-
-    #   table(stationdata.ts[, ".id"],
-    #         stationdata.ts[, "V_N"],
-    #         stationdata.ts[, "gridpoint"])
-    # for (gridpoint in dimnames(nStatwC)[[3]]) {
-    #   if (any(dimnames(nStatwC)[[2]] != '0'))
-    #     iscloudyperstation <- rep(F, dim(nStatwC[, , gridpoint])[1])
-    #   for (i in 1:dim(nStatwC[, , gridpoint])[1]) {
-    #     if (any(nStatwC[i, , gridpoint]) > 0)
-    #       iscloudyperstation[i] <- T
-    #   }
-    #
-    #   output[gridpoint, 5] <-
-    #     sum(iscloudyperstation)
-    # }
-    
-    #
-    # fill in number of stations with instrument measurments
     return(output)
   }
 
@@ -359,7 +325,7 @@ tic()
 ts.iter <- 1:length(grid.dates)
 with_progress({
   p <- progressor(along = ts.iter)
-  grid.cloudtypes.timeseries <-
+  grid.precipitationType.timeseries <-
     foreach (ts = ts.iter,
              .combine = "acomb",
              .errorhandling = "pass") %dopar% {
@@ -377,25 +343,41 @@ with_progress({
 toc()
 
 # dimension names with dates and variable names..
-dimnames(grid.cloudtypes.timeseries) <-
+dimnames(grid.precipitationType.timeseries) <-
   list(
     gridpoint = seq(1, 6),
-    criterion = c("Q1",
-                  "Q2",
-                  "coverage",
-                  "nStations",
-                  "nNA",
-                  "nInstrument"),
-    date = grid.dates
+    variable = c("Q1",
+                 "Q2",
+                 "coverage",
+                 "nStations",
+                 "nNA",
+                 "nInstrument"),
+    datetime = format(grid.dates)
   )
 
-# save it
+# save it as RData
 save(
-  grid.cloudtypes.timeseries,
+  grid.precipitationType.timeseries,
   file = paste(
     dir_data,
-    "parallel_hourly_gridded_cloudtypes_Q1_Q2_timeseries.RData",
+    "gridded_precipitationType_Q1_Q2_timeseries.RData",
     sep =
       ""
   )
 )
+
+# save it as a csv file
+grid.precipitationType.timeseries <-
+  melt(grid.precipitationType.timeseries)
+grid.precipitationType.timeseries$datetime <-
+  as.POSIXct(grid.precipitationType.timeseries$datetime, tz = "UTC")
+grid.precipitationType.timeseries$variable <-
+  as.character(grid.precipitationType.timeseries$variable)
+grid.precipitationType.timeseries$variable[grid.precipitationType.timeseries$variable ==
+                                             "Q1"]
+write.csv(grid.precipitationType.timeseries, file = paste(
+  dir_data,
+  "gridded_precipitationType_Q1_Q2_timeseries.csv",
+  sep =
+    ""
+), row.names = F)
